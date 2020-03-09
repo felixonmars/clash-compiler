@@ -277,11 +277,19 @@ instance KnownNat n => Bounded (Signed n) where
   minBound = minBound#
   maxBound = maxBound#
 
-minBound#,maxBound# :: KnownNat n => Signed n
+minBound# :: forall n. KnownNat n => Signed n
+minBound# =
+  case natVal (Proxy :: Proxy n) of
+    0 -> errorX "minBound of 'Signed 0' is undefined"
+    n -> S (negate $ 2 ^ (n - 1))
 {-# NOINLINE minBound# #-}
-minBound# = let res = S $ negate $ 2 ^ (natVal res - 1) in res
+
+maxBound# :: forall n. KnownNat n => Signed n
+maxBound# =
+  case natVal (Proxy :: Proxy n) of
+    0 -> errorX "maxBound of 'Signed 0' is undefined"
+    n -> S (2 ^ (n - 1) - 1)
 {-# NOINLINE maxBound# #-}
-maxBound# = let res = S $ 2 ^ (natVal res - 1) - 1 in res
 
 -- | Operators do @wrap-around@ on overflow
 instance KnownNat n => Num (Signed n) where

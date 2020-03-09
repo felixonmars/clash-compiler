@@ -259,14 +259,20 @@ instance KnownNat n => Bounded (Unsigned n) where
   minBound = minBound#
   maxBound = maxBound#
 
+-- TODO: Add blackbox
+minBound# :: forall n. KnownNat n => Unsigned n
+minBound# =
+  case natVal (Proxy :: Proxy n) of
+    0 -> errorX "minBound of 'Unsigned 0' is undefined"
+    _ -> U 0
 {-# NOINLINE minBound# #-}
-minBound# :: Unsigned n
-minBound# = U 0
 
+maxBound# :: forall n. KnownNat n => Unsigned n
+maxBound# =
+  case natVal (Proxy :: Proxy n) of
+    0 -> errorX "maxBound of 'Unsigned 0' is undefined"
+    n -> let m = 1 `shiftL` fromInteger n in  U (m - 1)
 {-# NOINLINE maxBound# #-}
-maxBound# :: forall n .KnownNat n => Unsigned n
-maxBound# = let m = 1 `shiftL` fromInteger (natVal (Proxy @n))
-            in  U (m - 1)
 
 instance KnownNat n => Num (Unsigned n) where
   (+)         = (+#)
@@ -452,7 +458,7 @@ resize# :: forall n m . KnownNat m => Unsigned n -> Unsigned m
 resize# = \(U i) -> if i >= m then U (i `mod` m) else U i
   where m = 1 `shiftL` fromInteger (natVal (Proxy @m))
 
-instance Default (Unsigned n) where
+instance KnownNat n => Default (Unsigned n) where
   def = minBound#
 
 instance KnownNat n => Lift (Unsigned n) where

@@ -527,14 +527,19 @@ instance KnownNat n => Bounded (BitVector n) where
   minBound = minBound#
   maxBound = maxBound#
 
+minBound# :: forall n. KnownNat n => BitVector n
+minBound# =
+  case natVal (Proxy :: Proxy n) of
+    0 -> errorX "minBound of 'BitVector 0' is undefined"
+    _ -> BV 0 0
 {-# NOINLINE minBound# #-}
-minBound# :: BitVector n
-minBound# = BV 0 0
 
+maxBound# :: forall n. KnownNat n => BitVector n
+maxBound# =
+  case natVal (Proxy :: Proxy n) of
+    0 -> errorX "maxBound of 'BitVector 0' is undefined"
+    n -> let m = 1 `shiftL` fromInteger n in  BV 0 (m-1)
 {-# NOINLINE maxBound# #-}
-maxBound# :: forall n . KnownNat n => BitVector n
-maxBound# = let m = 1 `shiftL` fromInteger (natVal (Proxy @n))
-            in  BV 0 (m-1)
 
 instance KnownNat n => Num (BitVector n) where
   (+)         = (+#)
@@ -694,7 +699,7 @@ reduceXor# :: KnownNat n => BitVector n -> Bit
 reduceXor# (BV 0 i) = Bit 0 (fromIntegral (popCount i `mod` 2))
 reduceXor# bv = undefErrorU "reduceXor" bv
 
-instance Default (BitVector n) where
+instance KnownNat n => Default (BitVector n) where
   def = minBound#
 
 -- * Accessors

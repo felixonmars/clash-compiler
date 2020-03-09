@@ -90,6 +90,7 @@ import Test.QuickCheck.Arbitrary  (Arbitrary (..), CoArbitrary (..),
                                    arbitraryBoundedIntegral,
                                    coarbitraryIntegral, shrinkIntegral)
 
+import Clash.Annotations.Primitive (hasBlackBox)
 import Clash.Class.BitPack        (BitPack (..), packXWith)
 import Clash.Class.Num            (ExtendingNum (..), SaturatingNum (..),
                                    SaturationMode (..))
@@ -220,12 +221,23 @@ enumFromThenTo# x1 x2 y = map I [unsafeToInteger x1, unsafeToInteger x2 .. unsaf
 {-# NOINLINE enumFromThenTo# #-}
 
 instance KnownNat n => Bounded (Index n) where
-  minBound = fromInteger# 0
+  minBound = minBound#
   maxBound = maxBound#
 
+minBound# :: forall n. KnownNat n => Index n
+minBound# =
+  case natVal (Proxy :: Proxy n) of
+    0 -> errorX "minBound of 'Index 0' is undefined"
+    _ -> 0
+{-# NOINLINE minBound# #-}
+{-# ANN minBound# hasBlackBox #-}
+
+maxBound# :: forall n. KnownNat n => Index n
+maxBound# =
+  case natVal (Proxy :: Proxy n) of
+    0 -> errorX "maxBound of 'Index 0' is undefined"
+    n -> fromInteger_INLINE (n - 1)
 {-# NOINLINE maxBound# #-}
-maxBound# :: KnownNat n => Index n
-maxBound# = let res = fromInteger_INLINE (natVal res - 1) in res
 
 -- | Operators report an error on overflow and underflow
 instance KnownNat n => Num (Index n) where
