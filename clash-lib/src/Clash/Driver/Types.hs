@@ -113,6 +113,10 @@ data ClashOpts = ClashOpts { opt_inlineLimit :: Int
                            , opt_inlineWFCacheLimit :: Word
                            -- ^ At what size do we cache normalized work-free
                            -- top-level binders.
+                           , opt_singleMain :: Bool
+                           -- ^ If -main-is is used, this flag indicates whether
+                           -- to compile just that top entity, or all top
+                           -- entities that it depends on
                            }
 
 instance Hashable ClashOpts where
@@ -142,7 +146,8 @@ instance Hashable ClashOpts where
     opt_forceUndefined `hashWithSalt`
     opt_checkIDir `hashWithSalt`
     opt_aggressiveXOpt `hashWithSalt`
-    opt_inlineWFCacheLimit
+    opt_inlineWFCacheLimit `hashWithSalt`
+    opt_singleMain
    where
     hashOverridingBool :: Int -> OverridingBool -> Int
     hashOverridingBool s1 Auto = hashWithSalt s1 (0 :: Int)
@@ -181,6 +186,7 @@ defClashOpts
   , opt_checkIDir           = True
   , opt_aggressiveXOpt      = False
   , opt_inlineWFCacheLimit  = 10 -- TODO: find "optimal" value
+  , opt_singleMain          = False
   }
 
 -- | Information about the generated HDL between (sub)runs of the compiler

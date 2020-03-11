@@ -190,3 +190,16 @@ Clash Compiler Flags
 
   **Default:** False
 
+-main-is
+  When using one of ``--vhdl``, ``--verilog``, or ``--systemverilog``, this
+  flag refers to synthesis target. For example, running Clash with
+  ``clash My.Module -main-is top --vhdl`` would synthesize ``My.Module.top``.
+  Note that this will make Clash NOT compile any other binders with Synthesize
+  annotations.
+
+-fclash-single-main
+  Compile just the top entity referred to with '-main-is', not any of the
+  top entities (binders with a Synthesize annotation) it transitively depends
+  on.
+
+  **Default:** False

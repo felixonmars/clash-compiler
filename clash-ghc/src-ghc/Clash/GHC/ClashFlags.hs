@@ -85,6 +85,7 @@ flagsClash r = [
   , defFlag "fclash-force-undefined"             $ OptIntSuffix (setUndefined r)
   , defFlag "fclash-aggressive-x-optimization"   $ NoArg (liftEwM (setAggressiveXOpt r))
   , defFlag "fclash-inline-workfree-limit"       $ IntSuffix (liftEwM . setInlineWFLimit r)
+  , defFlag "fclash-single-main"                 $ NoArg (liftEwM (setSingleMain r))
   ]
 
 -- | Print deprecated flag warning
@@ -158,6 +159,9 @@ setNoClean r = modifyIORef r (\c -> c {opt_cleanhdl = False})
 
 setNoPrimWarn :: IORef ClashOpts -> IO ()
 setNoPrimWarn r = modifyIORef r (\c -> c {opt_primWarn = False})
+
+setSingleMain :: IORef ClashOpts -> IO ()
+setSingleMain r = modifyIORef r (\c -> c {opt_singleMain = True})
 
 setIntWidth :: IORef ClashOpts
             -> Int

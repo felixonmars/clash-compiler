@@ -518,6 +518,9 @@ runClashTest = defaultMain $ clashTestRoot
         , outputTest ("tests" </> "shouldwork" </> "TopEntity") allTargets [] [] "T1033" "main"
         , outputTest ("tests" </> "shouldwork" </> "TopEntity") allTargets [] [] "T1072" "main"
         , outputTest ("tests" </> "shouldwork" </> "TopEntity") allTargets [] [] "T1074" "main"
+        , outputTest ("tests" </> "shouldwork" </> "TopEntity") [SystemVerilog] ["-main-is", "topEntity1"] [] "Multiple" "main1"
+        , outputTest ("tests" </> "shouldwork" </> "TopEntity") [Verilog] ["-main-is", "topEntity2", "-fclash-single-main"] [] "Multiple" "main2"
+        , outputTest ("tests" </> "shouldwork" </> "TopEntity") [VHDL] ["-main-is", "topEntity3"] [] "Multiple" "main3"
         , runTest "T1139" def{hdlSim=False}
         ]
       , clashTestGroup "Unit"

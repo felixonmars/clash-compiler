@@ -225,15 +225,25 @@ generateHDL
   -> (PrimStep, PrimUnwind)
   -- ^ Hardcoded evaluator (delta-reduction)
   -> [TopEntityT]
-  -- ^ Topentities and associated testbench
+  -- ^ All topentities and associated testbench
+  -> Maybe (TopEntityT, [TopEntityT])
+  -- ^ Main top entity to compile. If Nothing, all top entities in previous
+  -- argument will be compiled.
   -> ClashOpts
   -- ^ Debug information level for the normalization process
   -> (Clock.UTCTime,Clock.UTCTime)
   -> IO ()
 generateHDL reprs bindingsMap hdlState primMap tcm tupTcm typeTrans eval
-  topEntities0 opts (startTime,prepTime) =
-    go prepTime HashMap.empty (sortTop bindingsMap topEntities2)
+  topEntities0 mainTopEntity opts (startTime,prepTime) =
+    go prepTime HashMap.empty (sortTop bindingsMap todo)
  where
+  -- Depending on the use of -main-is and -fclash-synthesize-single-topentity
+  -- we'd like to compile a subset of all available top entities
+  todo =
+    case mainTopEntity of
+      Nothing -> topEntities2
+      Just (t, ts) -> if opt_singleMain opts then [t] else t:ts
+
   topEntities1 = map (splitTopEntityT tcm bindingsMap) topEntities0
   -- Remove forall's used in type equality constraints
   topEntities2 = map (\(TopEntityT var annM tbM) -> TopEntityT var{varType=tvSubstWithTyEq (varType var)} annM tbM) topEntities1
