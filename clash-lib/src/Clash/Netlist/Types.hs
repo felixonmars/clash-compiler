@@ -13,6 +13,7 @@
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE MagicHash #-}
 {-# LANGUAGE PatternSynonyms #-}
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE TemplateHaskell #-}
@@ -152,9 +153,6 @@ data ComponentPrefix
 -- | Existentially quantified backend
 data SomeBackend where
   SomeBackend :: Backend backend => backend -> SomeBackend
-
--- | Signal reference
-type Identifier = Text
 
 type Comment = Text
 

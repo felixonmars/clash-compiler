@@ -255,6 +255,7 @@ Library
                       Data.Text.Prettyprint.Doc.Extra
 
   Other-Modules:      Clash.Annotations.TopEntity.Extra
+                      Control.Applicative.Extra
                       Data.Aeson.Extra
                       Data.Primitive.ByteArray.Extra
                       Data.Semigroup.Monad.Extra
