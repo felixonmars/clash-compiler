@@ -64,6 +64,7 @@ operator that uses truncation introduces an additional error of /0.109375/:
 
 -}
 
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE ConstraintKinds #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
@@ -123,6 +124,7 @@ import GHC.TypeLits.Extra         (Max)
 import Language.Haskell.TH        (Q, TExp, TypeQ, appT, conT, litT, mkName,
                                    numTyLit, sigE)
 import Language.Haskell.TH.Syntax (Lift(..))
+import Language.Haskell.TH.Compat
 import Test.QuickCheck            (Arbitrary, CoArbitrary)
 
 import Clash.Class.BitPack        (BitPack (..))
@@ -538,6 +540,9 @@ instance (Lift (rep (int + frac)), KnownNat frac, KnownNat int, Typeable rep) =>
                           (decFixed (typeRep (asRepProxy f))
                                     (natVal (asIntProxy f))
                                     (natVal f))
+#if MIN_VERSION_template_haskell(2,16,0)
+  liftTyped = liftTypedFromUntyped
+#endif
 
 decFixed :: TypeRep -> Integer -> Integer -> TypeQ
 decFixed r i f = do

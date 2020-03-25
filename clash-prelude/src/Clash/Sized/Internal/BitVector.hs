@@ -148,6 +148,7 @@ import GHC.TypeLits               (KnownNat, Nat, type (+), type (-), natVal)
 import GHC.TypeLits.Extra         (Max)
 import Language.Haskell.TH        (Q, TExp, TypeQ, appT, conT, litT, numTyLit, sigE, Lit(..), litE, Pat, litP)
 import Language.Haskell.TH.Syntax (Lift(..))
+import Language.Haskell.TH.Compat
 import Test.QuickCheck.Arbitrary  (Arbitrary (..), CoArbitrary (..),
                                    arbitraryBoundedIntegral,
                                    coarbitraryIntegral, shrinkIntegral)
@@ -232,6 +233,9 @@ instance NFDataX Bit where
 instance Lift Bit where
   lift (Bit m i) = [| fromInteger## $(litE (WordPrimL (toInteger m))) i |]
   {-# NOINLINE lift #-}
+#if MIN_VERSION_template_haskell(2,16,0)
+  liftTyped = liftTypedFromUntyped
+#endif
 
 instance Eq Bit where
   (==) = eq##
@@ -924,6 +928,9 @@ truncateB# = \(BV msk i) -> BV (msk `mod` m) (i `mod` m)
 instance KnownNat n => Lift (BitVector n) where
   lift bv@(BV m i) = sigE [| fromInteger# m $(litE (IntegerL (toInteger i))) |] (decBitVector (natVal bv))
   {-# NOINLINE lift #-}
+#if MIN_VERSION_template_haskell(2,16,0)
+  liftTyped = liftTypedFromUntyped
+#endif
 
 decBitVector :: Integer -> TypeQ
 decBitVector n = appT (conT ''BitVector) (litT $ numTyLit n)

@@ -77,6 +77,7 @@ import GHC.TypeLits.Extra (CLog, FLog, Div, Log, Mod, Min, Max)
 import GHC.Natural        (naturalFromInteger)
 import Language.Haskell.TH (appT, conT, litT, numTyLit, sigE)
 import Language.Haskell.TH.Syntax (Lift (..))
+import Language.Haskell.TH.Compat
 import Numeric.Natural    (Natural)
 import Unsafe.Coerce      (unsafeCoerce)
 import Clash.XException   (ShowX (..), showsPrecXWith)
@@ -97,6 +98,9 @@ data SNat (n :: Nat) where
 instance Lift (SNat n) where
   lift s = sigE [| SNat |]
                 (appT (conT ''SNat) (litT $ numTyLit (snatToInteger s)))
+#if MIN_VERSION_template_haskell(2,16,0)
+  liftTyped = liftTypedFromUntyped
+#endif
 
 -- | Create an @`SNat` n@ from a proxy for /n/
 snatProxy :: KnownNat n => proxy n -> SNat n

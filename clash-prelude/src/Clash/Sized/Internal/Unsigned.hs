@@ -97,6 +97,7 @@ import GHC.TypeLits.Extra             (Max)
 import GHC.Word                       (Word (..), Word8 (..), Word16 (..), Word32 (..))
 import Language.Haskell.TH            (TypeQ, appT, conT, litT, numTyLit, sigE)
 import Language.Haskell.TH.Syntax     (Lift(..))
+import Language.Haskell.TH.Compat
 import Test.QuickCheck.Arbitrary      (Arbitrary (..), CoArbitrary (..),
                                        arbitraryBoundedIntegral,
                                        coarbitraryIntegral)
@@ -458,6 +459,9 @@ instance Default (Unsigned n) where
 instance KnownNat n => Lift (Unsigned n) where
   lift u@(U i) = sigE [| fromInteger# i |] (decUnsigned (natVal u))
   {-# NOINLINE lift #-}
+#if MIN_VERSION_template_haskell(2,16,0)
+  liftTyped = liftTypedFromUntyped
+#endif
 
 decUnsigned :: Integer -> TypeQ
 decUnsigned n = appT (conT ''Unsigned) (litT $ numTyLit n)
